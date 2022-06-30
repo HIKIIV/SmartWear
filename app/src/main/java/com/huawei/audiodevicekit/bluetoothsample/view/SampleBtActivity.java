@@ -8,6 +8,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioFormat;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
@@ -95,6 +96,15 @@ public class SampleBtActivity
 
     private TextView tips;
 
+    //  media player, for play the record
+    private MediaPlayer mediaPlayer = new MediaPlayer();
+
+    //  play, pause and stop for media player
+    private Button btnplay;
+    private Button btnpause;
+    private Button btnstop;
+    private boolean isMediaPlayerRelease = true;
+
     private double loc_longitude = 0;   // 持久化在内存中记录的经纬度
     private double loc_latitude = 0;    // 持久化在内存中记录的经纬度
 
@@ -176,6 +186,12 @@ public class SampleBtActivity
         spinner = findViewById(R.id.spinner);
         btnSendCmd = findViewById(R.id.btn_send_cmd);
         rvFoundDevice = findViewById(R.id.found_device);
+
+        //  play, pause and stop buttons
+        btnplay = findViewById(R.id.Play);
+        btnpause = findViewById(R.id.Pause);
+        btnstop = findViewById(R.id.Stop);
+
         initSpinner();
         initRecyclerView();
         maps = new ArrayList<>();
@@ -211,6 +227,71 @@ public class SampleBtActivity
                 //停止录音
             }
         });
+
+        btnplay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mediaPlayer == null || !mediaPlayer.isPlaying()) {
+                    if (isMediaPlayerRelease) {
+                        initMediaPlayer();
+                        isMediaPlayerRelease = false;
+                    }
+                    mediaPlayer.start();
+                    btnplay.setEnabled(false);
+                    btnpause.setEnabled(true);
+                    btnstop.setEnabled(true);
+                }
+            }
+        });
+
+        btnpause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    mediaPlayer.pause();
+                }
+                btnplay.setEnabled(true);
+                btnpause.setEnabled(false);
+                btnstop.setEnabled(false);
+            }
+        });
+
+        btnstop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    if (mediaPlayer != null) {
+                        mediaPlayer.stop();
+                        mediaPlayer.release();
+                        mediaPlayer = null;
+                    }
+                    isMediaPlayerRelease = true;
+                }
+                btnplay.setEnabled(true);
+                btnpause.setEnabled(false);
+                btnstop.setEnabled(false);
+            }
+        });
+    }
+
+    private void initMediaPlayer() {
+        if (mediaPlayer != null) {
+            mediaPlayer.reset();
+        } else {
+            mediaPlayer = new MediaPlayer();
+        }
+        File file = new File(this.getExternalFilesDir("").getAbsolutePath(),
+                "ideal.wav");
+        try {
+            tips.setText("initMediaPlayer: " + file.getPath());
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(file.getPath());          //  path to mp3
+            tips.setText("initMediaPlayer: set DataSource failed");
+            mediaPlayer.prepare();                              //  let MediaPlayer prepare
+            tips.setText("initMediaPlayer: out");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initSpinner() {
@@ -280,7 +361,7 @@ public class SampleBtActivity
 
     public String getSaveFilePath(){
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
-        File file = new File(Environment.getExternalStorageDirectory(), "EyeWear");
+        File file = new File(this.getExternalFilesDir("").getAbsolutePath(), "");
         if (!file.exists()) {
             file.mkdirs();
         }
@@ -440,6 +521,10 @@ public class SampleBtActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+        }
         getPresenter().deInit();
     }
 }
