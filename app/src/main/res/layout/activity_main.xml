@@ -246,8 +246,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="0dp"
         android:layout_marginTop="50dp"
-        android:text="录音状态"
-
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/item_notify_data" />
 
     <TextView
@@ -269,33 +268,45 @@
         app:layout_constraintTop_toTopOf="@+id/longitude" />
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="750dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
 
         <Button
             android:id="@+id/Play"
             android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_weight="1"
             android:layout_marginTop="690dp"
+            android:layout_weight="1"
             android:text="Play" />
 
         <Button
             android:id="@+id/Pause"
             android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_weight="1"
             android:layout_marginTop="690dp"
-            android:text="Pause"/>
+            android:layout_weight="1"
+            android:text="Pause" />
 
         <Button
             android:id="@+id/Stop"
             android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_weight="1"
             android:layout_marginTop="690dp"
-            android:text="Stop"/>
+            android:layout_weight="1"
+            android:text="Stop" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="650dp"
+        android:layout_marginStart="145dp"
+        android:text="Start"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/item_device" />
 </androidx.constraintlayout.widget.ConstraintLayout>

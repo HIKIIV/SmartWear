@@ -3,6 +3,7 @@ package com.huawei.audiodevicekit.bluetoothsample.view;
 import android.Manifest;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -71,10 +72,6 @@ public class SampleBtActivity
     private Button btnConnect;
 
     private Button btnDisconnect;
-
-    private Button btn1;
-
-    private Button btn2;
 
     private Spinner spinner;
 
@@ -180,8 +177,8 @@ public class SampleBtActivity
         btnSearch = findViewById(R.id.btn_search);
         btnConnect = findViewById(R.id.btn_connect);
         btnDisconnect = findViewById(R.id.btn_disconnect);
-        btn1 = findViewById(R.id.btx1);
-        btn2 = findViewById(R.id.btx2);
+        Button btn1 = findViewById(R.id.btx1);
+        Button btn2 = findViewById(R.id.btx2);
         tips = findViewById(R.id.RecordStatus);
         spinner = findViewById(R.id.spinner);
         btnSendCmd = findViewById(R.id.btn_send_cmd);
@@ -191,6 +188,16 @@ public class SampleBtActivity
         btnplay = findViewById(R.id.Play);
         btnpause = findViewById(R.id.Pause);
         btnstop = findViewById(R.id.Stop);
+
+        Button start = findViewById(R.id.start); // starting the main program (entering header)
+        start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(getApplicationContext(), header.class);//this前面为当前activty名称，class前面为要跳转到得activity名称
+                startActivity(intent);
+            }
+        });
 
         initSpinner();
         initRecyclerView();
@@ -456,7 +463,6 @@ public class SampleBtActivity
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Toast.makeText(getApplicationContext(), "Location updates", Toast.LENGTH_SHORT).show();
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
                 loc_longitude = longitude;  // 更新类的纬度
