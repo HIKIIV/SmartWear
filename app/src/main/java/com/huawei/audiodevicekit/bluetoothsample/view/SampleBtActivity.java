@@ -382,9 +382,10 @@ public class SampleBtActivity
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5, 0, new LocationListener() {
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                Toast.makeText(getApplicationContext(), "Location updates", Toast.LENGTH_SHORT).show();
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
                 TextView loctext1 = findViewById(R.id.longitude);
