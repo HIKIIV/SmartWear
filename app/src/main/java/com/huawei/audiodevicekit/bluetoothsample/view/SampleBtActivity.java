@@ -39,11 +39,14 @@ import com.huawei.audiodevicekit.mvp.view.support.BaseAppCompatActivity;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import tech.oom.idealrecorder.IdealRecorder;
 import tech.oom.idealrecorder.StatusListener;
@@ -91,6 +94,9 @@ public class SampleBtActivity
     private TextView tvDataCount;
 
     private TextView tips;
+
+    private double loc_longitude = 0;   // 持久化在内存中记录的经纬度
+    private double loc_latitude = 0;    // 持久化在内存中记录的经纬度
 
     private StatusListener statusListener = new StatusListener() {
         @Override
@@ -267,13 +273,36 @@ public class SampleBtActivity
         rvFoundDevice.setAdapter(mAdapter);
     }
 
+    public static String doubleToString(double num){
+        //使用0.000000不足位补0，#.##仅保留有效位
+        return new DecimalFormat("0.0000").format(num);
+    }
+
     public String getSaveFilePath(){
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
         File file = new File(Environment.getExternalStorageDirectory(), "EyeWear");
         if (!file.exists()) {
             file.mkdirs();
         }
-        File wavFile = new File(file, "ideal.wav");
+        // 文件的前后加入时间、经纬度数据
+        Calendar calendars = Calendar.getInstance();
+
+        calendars.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+
+        String year = String.valueOf(calendars.get(Calendar.YEAR));
+        String month = String.valueOf(calendars.get(Calendar.MONTH));
+        String day = String.valueOf(calendars.get(Calendar.DATE));
+        String hour = String.valueOf(calendars.get(Calendar.HOUR));
+        String min = String.valueOf(calendars.get(Calendar.MINUTE));
+        String second = String.valueOf(calendars.get(Calendar.SECOND));
+
+        // 文件前加入经度
+        // 文件后加入纬度
+        // 纬度之后加入时间
+        String filePath = doubleToString(loc_latitude) + "ideal" + doubleToString(loc_longitude)
+                + "##" + year + "#" + month + "#" + day + "#" + hour + "#" + min + "#" + second + ".wav";
+
+        File wavFile = new File(file, filePath);
         if(wavFile.exists()) {
             wavFile.delete();
         }
@@ -306,6 +335,8 @@ public class SampleBtActivity
             public void onLocationChanged(Location location) {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
+                loc_longitude = longitude;  // 更新类的纬度
+                loc_latitude = latitude;    // 更新类的经度
                 TextView loctext1 = findViewById(R.id.longitude);
                 TextView loctext2 = findViewById(R.id.latitude);
                 loctext1.setText(String.valueOf(longitude));
