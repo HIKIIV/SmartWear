@@ -11,7 +11,6 @@ import android.media.AudioFormat;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -48,6 +47,7 @@ import java.util.Objects;
 
 import tech.oom.idealrecorder.IdealRecorder;
 import tech.oom.idealrecorder.StatusListener;
+import tech.oom.idealrecorder.utils.Log;
 
 public class SampleBtActivity
     extends BaseAppCompatActivity<SampleBtContract.Presenter, SampleBtContract.View>
@@ -63,6 +63,10 @@ public class SampleBtActivity
     private TextView tvSendCmdResult;
 
     private Button btnSearch;
+
+    private Button btnConnect;
+
+    private Button btnDisconnect;
 
     private Button btn1;
 
@@ -154,13 +158,15 @@ public class SampleBtActivity
     protected void initView() {
         tvDevice = findViewById(R.id.tv_device);
         tvStatus = findViewById(R.id.tv_status);
-        btn1 = findViewById(R.id.button1);
-        btn2 = findViewById(R.id.button2);
-        tips = findViewById(R.id.recordStatus);
         tvDataCount = findViewById(R.id.tv_data_count);
         listView = findViewById(R.id.listview);
         tvSendCmdResult = findViewById(R.id.tv_send_cmd_result);
         btnSearch = findViewById(R.id.btn_search);
+        btnConnect = findViewById(R.id.btn_connect);
+        btnDisconnect = findViewById(R.id.btn_disconnect);
+        btn1 = findViewById(R.id.btx1);
+        btn2 = findViewById(R.id.btx2);
+        tips = findViewById(R.id.RecordStatus);
         spinner = findViewById(R.id.spinner);
         btnSendCmd = findViewById(R.id.btn_send_cmd);
         rvFoundDevice = findViewById(R.id.found_device);
@@ -300,8 +306,8 @@ public class SampleBtActivity
             public void onLocationChanged(Location location) {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-                TextView loctext1 = findViewById(R.id.textLoc1);
-                TextView loctext2 = findViewById(R.id.textLoc2);
+                TextView loctext1 = findViewById(R.id.longitude);
+                TextView loctext2 = findViewById(R.id.latitude);
                 loctext1.setText(String.valueOf(longitude));
                 loctext2.setText(String.valueOf(latitude));
             }
@@ -331,6 +337,8 @@ public class SampleBtActivity
     @Override
     protected void setOnclick() {
         super.setOnclick();
+        btnConnect.setOnClickListener(v -> getPresenter().connect(mMac));
+        btnDisconnect.setOnClickListener(v -> getPresenter().disConnect(mMac));
         btnSendCmd.setOnClickListener(v -> getPresenter().sendCmd(mMac, mATCmd.getType()));
         btnSearch.setOnClickListener(v -> getPresenter().checkLocationPermission(this));
     }
@@ -375,15 +383,13 @@ public class SampleBtActivity
 
     @Override
     public void onSensorDataChanged(SensorData sensorData) {
-//        runOnUiThread(() -> {
-//            Map<String, String> map = new HashMap<>();
-//            map.put("data", sensorData.toString());
-//            maps.add(0, map);
-//            tvDataCount.setText(getString(R.string.sensor_data, maps.size()));
-//            simpleAdapter.notifyDataSetChanged();
-//        });
-
-
+        runOnUiThread(() -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("data", sensorData.toString());
+            maps.add(0, map);
+            tvDataCount.setText(getString(R.string.sensor_data, maps.size()));
+            simpleAdapter.notifyDataSetChanged();
+        });
     }
 
     @Override

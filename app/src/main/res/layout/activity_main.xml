@@ -79,29 +79,63 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ll_send_cmd"
-        android:layout_width="0dp"
-        android:layout_height="54dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_search">
-
-        <Spinner
-            android:id="@+id/spinner"
+            android:id="@+id/ll_connect"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_vertical" />
+            android:layout_height="54dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ll_search">
 
         <Button
-            android:id="@+id/btn_send_cmd"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/send_AT_cmd" />
+                android:id="@+id/btn_connect"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/connect" />
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/ll_disconnect"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ll_connect">
+
+        <Button
+                android:id="@+id/btn_disconnect"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/disconnect" />
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/ll_send_cmd"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ll_disconnect">
+
+        <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical" />
+
+        <Button
+                android:id="@+id/btn_send_cmd"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/send_AT_cmd" />
     </LinearLayout>
 
     <TextView
@@ -187,51 +221,50 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="60dp"
+        android:id="@+id/btx1"
+        android:layout_width="78dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="9dp"
         android:text="Record"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/item_notify_data" />
+        app:layout_constraintTop_toBottomOf="@+id/item_notify_data" />
 
     <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
+        android:id="@+id/btx2"
+        android:layout_width="78dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="88dp"
+        android:layout_marginTop="9dp"
         android:text="Finish"
-        app:layout_constraintStart_toEndOf="@+id/button1"
-        app:layout_constraintTop_toTopOf="@+id/button1" />
+        app:layout_constraintStart_toStartOf="@+id/btx1"
+        app:layout_constraintTop_toBottomOf="@+id/item_notify_data" />
 
     <TextView
-        android:id="@+id/recordStatus"
+        android:id="@+id/RecordStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="36dp"
-        android:text="RecordStatus"
+        android:layout_marginStart="9dp"
+        android:layout_marginTop="15dp"
+        android:text="录音状态"
+        app:layout_constraintStart_toEndOf="@+id/btx2"
+        app:layout_constraintTop_toBottomOf="@+id/item_notify_data" />
+
+    <TextView
+        android:id="@+id/longitude"
+        android:layout_width="120dp"
+        android:layout_height="18dp"
+        android:layout_marginTop="5dp"
+        android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/item_notify_data" />
 
     <TextView
-        android:id="@+id/textLoc1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:layout_marginEnd="36dp"
+        android:id="@+id/latitude"
+        android:layout_width="120dp"
+        android:layout_height="18dp"
+        android:layout_marginTop="22dp"
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/recordStatus" />
-
-    <TextView
-        android:id="@+id/textLoc2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="36dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textLoc1" />
+        app:layout_constraintTop_toTopOf="@+id/longitude" />
 </androidx.constraintlayout.widget.ConstraintLayout>
