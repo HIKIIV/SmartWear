@@ -97,7 +97,7 @@ public class SampleBtActivity
     private TextView tips;
 
     //  media player, for play the record
-    private MediaPlayer mediaPlayer = new MediaPlayer();
+    private MediaPlayer mediaPlayer = new MediaPlayer();    // 怀疑是否需要改成NULL
 
     //  play, pause and stop for media player
     private Button btnplay;
@@ -210,7 +210,7 @@ public class SampleBtActivity
                 idealRecorder.setRecordFilePath(getSaveFilePath());
                 //如果需要保存录音文件  设置好保存路径就会自动保存  也可以通过onRecordData 回调自己保存  不设置 不会保存录音
                 IdealRecorder.RecordConfig recordConfig = new IdealRecorder.RecordConfig(MediaRecorder.AudioSource.MIC, 48000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-                idealRecorder.setRecordConfig(recordConfig).setMaxRecordTime(20000).setVolumeInterval(200);
+                idealRecorder.setRecordConfig(recordConfig).setMaxRecordTime(300000).setVolumeInterval(200);
                 //设置录音配置 最长录音时长 以及音量回调的时间间隔
                 idealRecorder.setStatusListener(statusListener);
                 idealRecorder.start();
@@ -233,7 +233,7 @@ public class SampleBtActivity
             public void onClick(View view) {
                 if (mediaPlayer == null || !mediaPlayer.isPlaying()) {
                     if (isMediaPlayerRelease) {
-                        initMediaPlayer();
+                        initMediaPlayer("ideal.wav");
                         isMediaPlayerRelease = false;
                     }
                     mediaPlayer.start();
@@ -274,14 +274,14 @@ public class SampleBtActivity
         });
     }
 
-    private void initMediaPlayer() {
+    private void initMediaPlayer(String dataName) {    // 加一个作为参数的文件名
         if (mediaPlayer != null) {
             mediaPlayer.reset();
         } else {
             mediaPlayer = new MediaPlayer();
         }
         File file = new File(this.getExternalFilesDir("").getAbsolutePath(),
-                "ideal.wav");
+                dataName);
         try {
             tips.setText("initMediaPlayer: " + file.getPath());
             mediaPlayer.reset();
@@ -397,6 +397,48 @@ public class SampleBtActivity
         return wavFile.getAbsolutePath();
     }
 
+    /**
+     *  play the audio according the location
+     */
+    private void loc_play() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
+        File file = new File(this.getExternalFilesDir("").getAbsolutePath(), "");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        File[] subFile = file.listFiles();
+        for (int iFileLength = 0; iFileLength < subFile.length; iFileLength++) {
+            // 判断是否为文件夹
+            if (!subFile[iFileLength].isDirectory()) {
+                String filename = subFile[iFileLength].getName();
+                int index_0 = filename.indexOf("ideal");
+                if(index_0 == -1){
+                    break;
+                }
+                int index_1 = filename.indexOf("##");
+                double out_latitude = Double.parseDouble(filename.substring(0, index_0));
+                double out_longitude = Double.parseDouble(filename.substring(index_0 + 5, index_1));
+                if(Math.abs(loc_latitude - out_latitude) + Math.abs(loc_longitude - out_longitude) < 0.0015){
+                    if (mediaPlayer == null || (!mediaPlayer.isPlaying() && !mediaPlayer.isLooping())) {
+                        if (isMediaPlayerRelease) {
+                            initMediaPlayer(filename);
+                            isMediaPlayerRelease = false;
+                        }
+                        mediaPlayer.start();
+                        btnplay.setEnabled(false);
+                        btnpause.setEnabled(true);
+                        btnstop.setEnabled(true);
+                    }
+                    break;
+                }
+            }
+            else{
+                continue;
+            }
+        }
+
+    }
+
     // location utilities
     private void locationDataInit() {
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -419,6 +461,8 @@ public class SampleBtActivity
                 double longitude = location.getLongitude();
                 loc_longitude = longitude;  // 更新类的纬度
                 loc_latitude = latitude;    // 更新类的经度
+
+                loc_play();
                 TextView loctext1 = findViewById(R.id.longitude);
                 TextView loctext2 = findViewById(R.id.latitude);
                 loctext1.setText(String.valueOf(longitude));
