@@ -107,7 +107,11 @@ public class SampleBtActivity
 
     private double last_loc_longitude = 0;  // 上次播放音频时的经纬度
     private double last_loc_latitude = 0;   // 上次播放音频时的经纬度
-    private int last_serial_num = -1;        // 上次播放音频时播放音频的序号
+    private int last_serial_num = -1;       // 上次播放音频时播放音频的序号
+
+    private int last_begin = 0;             // 上次播放音频的开始检测时间（60 * hour + minute）
+    private int last_end = 0;               // 上次播放音频的结束检测时间（60 * hour + minute）
+    private int last_time_num = -1;         // 上次按照时间播放的音频序号
 
     private StatusListener statusListener = new StatusListener() {
         @Override
@@ -408,12 +412,81 @@ public class SampleBtActivity
         return wavFile.getAbsolutePath();
     }
 
-//    /**
-//     *  play the audio according the location
-//     */
-//    private void time_play() {
-//
-//    }
+    /**
+     *  play the audio according the time
+     */
+    private void time_play() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
+        // 询问权限
+        File file = new File(this.getExternalFilesDir("").getAbsolutePath(), "");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        File[] subFile = file.listFiles();
+        boolean play_flag = false;
+        Calendar calendars = Calendar.getInstance();
+
+        calendars.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+
+        String hour = String.valueOf(calendars.get(Calendar.HOUR));
+        String min = String.valueOf(calendars.get(Calendar.MINUTE));
+        int now_time = Integer.parseInt(hour) * 60 + Integer.parseInt(min);
+
+        for (int iFileLength = 0; iFileLength < subFile.length; iFileLength++) {
+            // 判断是否为文件夹
+            if (!subFile[iFileLength].isDirectory()) {
+                String filename = subFile[iFileLength].getName();
+                if(filename.indexOf("ideal") <= 0) {
+                    continue;
+                }
+                int index_0 = filename.indexOf("##");   // 检测时间：时-分
+                if(index_0 <=  5) {
+                    continue;
+                }
+                String sub_filename = filename.substring(index_0 + 2);  // 此时格式为 年#月#日#时#分#秒
+                sub_filename = sub_filename.substring(sub_filename.indexOf("#") + 1);   // 此时格式为 月#日#时#分#秒.wav
+                sub_filename = sub_filename.substring(sub_filename.indexOf("#") + 1);   // 此时格式为 日#时#分#秒.wav
+                sub_filename = sub_filename.substring(sub_filename.indexOf("#") + 1);   // 此时格式为 时#分#秒.wav
+                int out_hour = Integer.parseInt(sub_filename.substring(0, sub_filename.indexOf("#")));
+                sub_filename = sub_filename.substring(sub_filename.indexOf("#") + 1);   // 此时格式为 分#秒.wav
+                int out_minute = Integer.parseInt(sub_filename.substring(0, sub_filename.indexOf("#")));
+
+                int mod_num = 12 * 60;
+
+                int end_time = (out_hour * 60 + out_minute + 5) % mod_num;
+                int begin_time = (out_hour * 60 + out_minute - 5 >= 0) ? out_hour * 60 + out_minute - 5 : out_hour * 60 + out_minute - 5 + mod_num;
+
+                if(now_time >= begin_time && now_time <= end_time){
+                    if(now_time >= last_begin && now_time <= last_end && iFileLength <= last_time_num) {
+                        continue;   // 不重复播放同一个时间的同样的音频，除非重启应用
+                    }
+                    if (mediaPlayer == null || (!mediaPlayer.isPlaying() && !mediaPlayer.isLooping())) {
+                        play_flag = true;
+
+                        initMediaPlayer(filename);
+                        isMediaPlayerRelease = false;
+
+                        mediaPlayer.start();
+                        last_begin = begin_time;
+                        last_end = end_time;
+                        last_time_num = iFileLength;      // 记录上一次播放时的文件序号
+                        btnplay.setEnabled(false);
+                        btnpause.setEnabled(true);
+                        btnstop.setEnabled(true);
+                    }
+                    break;
+                }
+            }
+            else{
+                continue;
+            }
+        }
+        if(!play_flag && now_time > last_end ) {
+            last_begin = -1;
+            last_end = -1;
+            last_time_num = -1;
+        }
+    }
 
     /**
      *  play the audio according the location
@@ -495,8 +568,8 @@ public class SampleBtActivity
                 double longitude = location.getLongitude();
                 loc_longitude = longitude;  // 更新类的纬度
                 loc_latitude = latitude;    // 更新类的经度
-
-                loc_play();
+                time_play();
+//                loc_play();
                 TextView loctext1 = findViewById(R.id.longitude);
                 TextView loctext2 = findViewById(R.id.latitude);
                 loctext1.setText(String.valueOf(longitude));
@@ -572,23 +645,6 @@ public class SampleBtActivity
         }
     }
 
-    private static int gravityUp = 4655 * 4655;
-    private int allAccPowLen = 0;
-    private int nearestDown = -1;
-    private int accPlayNum = 1;
-    private int maxAccPowOneSense(SensorData sensorData) {
-        int x, y, totalAccPow, maxAccPow = 0;
-        for (int i = 0; i < sensorData.accelDataLen; i++) {
-            x = sensorData.accelData[i].x;
-            y = sensorData.accelData[i].y;
-            totalAccPow = x * x + y * y;
-            if (maxAccPow < totalAccPow) {
-                maxAccPow = totalAccPow;
-            }
-        }
-        return maxAccPow;
-    }
-
     @Override
     public void onSensorDataChanged(SensorData sensorData) {
         runOnUiThread(() -> {
@@ -596,47 +652,7 @@ public class SampleBtActivity
             map.put("data", sensorData.toString());
             maps.add(0, map);
             tvDataCount.setText(getString(R.string.sensor_data, maps.size()));
-
-            if (sensorData.serviceId == 43) {
-                int maxAccPow = maxAccPowOneSense(sensorData);
-
-                if (maxAccPow > 0) {
-                    tips.setText(String.valueOf(maxAccPow));
-
-                    if (allAccPowLen < 3) {
-                        if (maxAccPow < gravityUp) {
-                            nearestDown = allAccPowLen;
-                        }
-                        allAccPowLen++;
-                    } else {
-                        if (maxAccPow < gravityUp) {
-                            nearestDown = 3;
-                        } else {
-                            if (nearestDown >= 0) {
-                                nearestDown--;
-                            }
-                        }
-
-                        if (nearestDown == -1) {
-                            if (mediaPlayer == null || !mediaPlayer.isPlaying()) {
-                                String filename = String.valueOf(accPlayNum) + ".mp3";
-                                accPlayNum = (accPlayNum == 5) ? 1 : (accPlayNum + 1);
-
-                                if (isMediaPlayerRelease) {
-                                    initMediaPlayer(filename);
-                                    isMediaPlayerRelease = false;
-                                }
-                                mediaPlayer.start();
-                                btnplay.setEnabled(false);
-                                btnpause.setEnabled(true);
-                                btnstop.setEnabled(true);
-                            }
-                        }
-                    }
-                }
-            }
-
-//            simpleAdapter.notifyDataSetChanged();
+            simpleAdapter.notifyDataSetChanged();
         });
     }
 
