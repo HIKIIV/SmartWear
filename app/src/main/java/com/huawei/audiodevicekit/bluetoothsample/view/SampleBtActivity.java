@@ -564,20 +564,13 @@ public class SampleBtActivity
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, new LocationListener() {
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 0, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
                 loc_longitude = longitude;  // 更新类的纬度
                 loc_latitude = latitude;    // 更新类的经度
-                if(mediaPlayer == null || !mediaPlayer.isPlaying()) {
-                    time_play();
-                }
-                if(mediaPlayer == null || !mediaPlayer.isPlaying()) {
-                    loc_play();
-                }
-
                 TextView loctext1 = findViewById(R.id.longitude);
                 TextView loctext2 = findViewById(R.id.latitude);
                 loctext1.setText(String.valueOf(longitude));
@@ -678,6 +671,13 @@ public class SampleBtActivity
             map.put("data", sensorData.toString());
             maps.add(0, map);
             tvDataCount.setText(getString(R.string.sensor_data, maps.size()));
+
+            if(mediaPlayer == null || !mediaPlayer.isPlaying()) {
+                time_play();
+            }
+            if(mediaPlayer == null || !mediaPlayer.isPlaying()) {
+                loc_play();
+            }
 
             if (sensorData.serviceId == 43) {
                 int maxAccPow = maxAccPowOneSense(sensorData);
