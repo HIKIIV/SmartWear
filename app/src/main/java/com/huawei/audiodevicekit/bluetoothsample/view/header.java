@@ -2,6 +2,7 @@ package com.huawei.audiodevicekit.bluetoothsample.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,11 +17,31 @@ public class header extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.header);
 
-        Button btnStart = findViewById(R.id.newchat);
+        Button btnNewchat = findViewById(R.id.newchat);
+        btnNewchat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "Click new chat", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent();
+                intent.setClass(header.this, location.class);//this前面为当前activty名称，class前面为要跳转到得activity名称
+                startActivity(intent);
+            }
+        });
+        Button btnNotif = findViewById(R.id.notifications);
+        btnNotif.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        Button btnStart = findViewById(R.id.header_start);
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Start pressed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Click start", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent();
+                intent.setClass(header.this, location.class);//this前面为当前activty名称，class前面为要跳转到得activity名称
+                startActivity(intent);
             }
         });
     }
