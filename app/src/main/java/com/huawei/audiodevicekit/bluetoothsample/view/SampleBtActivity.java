@@ -432,14 +432,17 @@ public class SampleBtActivity
             if (!subFile[iFileLength].isDirectory()) {
                 String filename = subFile[iFileLength].getName();
                 int index_0 = filename.indexOf("ideal"); // 后续拆分成time、location、event三大模式之后，需要把文件名的识别加上去
-                if(index_0 == -1){
+                if(index_0 <= 0){
                     continue;
                 }
                 int index_1 = filename.indexOf("##");
+                if(index_1 <= index_0 + 5) {
+                    continue;
+                }
                 double out_latitude = Double.parseDouble(filename.substring(0, index_0));
                 double out_longitude = Double.parseDouble(filename.substring(index_0 + 5, index_1));
-                if(Math.abs(loc_latitude - out_latitude) + Math.abs(loc_longitude - out_longitude) < 0.0004){
-                    if(Math.abs(last_loc_latitude - out_latitude) + Math.abs(last_loc_longitude - out_longitude) < 0.0004 && iFileLength <= last_serial_num) {
+                if(Math.abs(loc_latitude - out_latitude) + Math.abs(loc_longitude - out_longitude) < 0.0003){
+                    if(Math.abs(last_loc_latitude - out_latitude) + Math.abs(last_loc_longitude - out_longitude) < 0.0003 && iFileLength <= last_serial_num) {
                         continue;   // 不重复播放同一个地点的同样的音频，如果游客长时间呆在同一个地点的话
                     }
                     if (mediaPlayer == null || (!mediaPlayer.isPlaying() && !mediaPlayer.isLooping())) {
