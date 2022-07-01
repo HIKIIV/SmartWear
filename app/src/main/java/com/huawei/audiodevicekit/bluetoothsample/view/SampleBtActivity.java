@@ -656,7 +656,7 @@ public class SampleBtActivity
     private static int gravityUp = 4655 * 4655;
     private int allAccPowLen = 0;
     private int nearestDown = -1;
-    private int accPlayNum = 1;
+//    private int accPlayNum = 1;
     private int maxAccPowOneSense(SensorData sensorData) {
         int x, y, totalAccPow, maxAccPow = 0;
         for (int i = 0; i < sensorData.accelDataLen; i++) {
@@ -670,7 +670,7 @@ public class SampleBtActivity
         return maxAccPow;
     }
 
-
+    private int last_event_num = -1;
     @Override
     public void onSensorDataChanged(SensorData sensorData) {
         runOnUiThread(() -> {
@@ -701,17 +701,44 @@ public class SampleBtActivity
 
                         if (nearestDown == -1) {
                             if (mediaPlayer == null || !mediaPlayer.isPlaying()) {
-                                String filename = String.valueOf(accPlayNum) + ".wav";
-                                accPlayNum = (accPlayNum == 5) ? 1 : (accPlayNum + 1);
-
-                                if (isMediaPlayerRelease) {
-                                    initMediaPlayer(filename);
-                                    isMediaPlayerRelease = false;
+                                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
+                                // 询问权限
+                                File file = new File(this.getExternalFilesDir("").getAbsolutePath(), "");
+                                if (!file.exists()) {
+                                    file.mkdirs();
                                 }
-                                mediaPlayer.start();
-                                btnplay.setEnabled(false);
-                                btnpause.setEnabled(true);
-                                btnstop.setEnabled(true);
+                                File[] subFile = file.listFiles();
+                                boolean play_flag = false;
+
+                                for (int iFileLength = 0; iFileLength < subFile.length; iFileLength++) {
+                                    // 判断是否为文件夹
+                                    if (!subFile[iFileLength].isDirectory()) {
+                                        String filename = subFile[iFileLength].getName();
+                                        if(filename.indexOf("event") <= 0) {
+                                            continue;
+                                        }
+                                        if (last_event_num < iFileLength) {     // 循环播放
+                                            play_flag = true;                   // 只播放上一次播放序号之后的文件
+
+                                            initMediaPlayer(filename);
+                                            isMediaPlayerRelease = false;
+
+                                            mediaPlayer.start();
+                                            last_event_num = iFileLength;       // 更新上一次的播放序号
+                                            btnplay.setEnabled(false);
+                                            btnpause.setEnabled(true);
+                                            btnstop.setEnabled(true);
+                                            break;
+                                        }
+
+                                    }
+                                    else{
+                                        continue;
+                                    }
+                                }
+                                if(!play_flag) {
+                                    last_event_num = -1;    // 若所有文件都没法播放，说明已经播放到头了，复位last_event_num以循环
+                                }
                             }
                         }
                     }
