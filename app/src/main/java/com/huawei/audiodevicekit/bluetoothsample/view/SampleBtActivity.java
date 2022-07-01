@@ -439,7 +439,7 @@ public class SampleBtActivity
             // 判断是否为文件夹
             if (!subFile[iFileLength].isDirectory()) {
                 String filename = subFile[iFileLength].getName();
-                if(filename.indexOf("ideal") <= 0) {
+                if(filename.indexOf("time") <= 0) {
                     continue;
                 }
                 int index_0 = filename.indexOf("##");   // 检测时间：时-分
@@ -507,7 +507,7 @@ public class SampleBtActivity
             // 判断是否为文件夹
             if (!subFile[iFileLength].isDirectory()) {
                 String filename = subFile[iFileLength].getName();
-                int index_0 = filename.indexOf("ideal"); // 后续拆分成time、location、event三大模式之后，需要把文件名的识别加上去
+                int index_0 = filename.indexOf("GPS"); // 后续拆分成time、location、event三大模式之后，需要把文件名的识别加上去
                 if(index_0 <= 0){
                     continue;
                 }
@@ -516,7 +516,7 @@ public class SampleBtActivity
                     continue;
                 }
                 double out_latitude = Double.parseDouble(filename.substring(0, index_0));
-                double out_longitude = Double.parseDouble(filename.substring(index_0 + 5, index_1));
+                double out_longitude = Double.parseDouble(filename.substring(index_0 + 3, index_1));
                 if(Math.abs(loc_latitude - out_latitude) + Math.abs(loc_longitude - out_longitude) < 0.0003){
                     if(Math.abs(last_loc_latitude - out_latitude) + Math.abs(last_loc_longitude - out_longitude) < 0.0003 && iFileLength <= last_serial_num) {
                         continue;   // 不重复播放同一个地点的同样的音频，如果游客长时间呆在同一个地点的话
@@ -571,8 +571,13 @@ public class SampleBtActivity
                 double longitude = location.getLongitude();
                 loc_longitude = longitude;  // 更新类的纬度
                 loc_latitude = latitude;    // 更新类的经度
-                time_play();
-//                loc_play();
+                if(mediaPlayer == null || !mediaPlayer.isPlaying()) {
+                    time_play();
+                }
+                if(mediaPlayer == null || !mediaPlayer.isPlaying()) {
+                    loc_play();
+                }
+
                 TextView loctext1 = findViewById(R.id.longitude);
                 TextView loctext2 = findViewById(R.id.latitude);
                 loctext1.setText(String.valueOf(longitude));
@@ -696,7 +701,7 @@ public class SampleBtActivity
 
                         if (nearestDown == -1) {
                             if (mediaPlayer == null || !mediaPlayer.isPlaying()) {
-                                String filename = String.valueOf(accPlayNum) + ".mp3";
+                                String filename = String.valueOf(accPlayNum) + ".wav";
                                 accPlayNum = (accPlayNum == 5) ? 1 : (accPlayNum + 1);
 
                                 if (isMediaPlayerRelease) {
