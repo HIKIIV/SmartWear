@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".bluetoothsample.view.location"
-    android:background="@drawable/location">
+    tools:context=".bluetoothsample.view.time"
+    android:background="@drawable/time">
 
     <Button
-        android:id="@+id/location_event"
+        android:id="@+id/time_event"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
@@ -18,21 +18,21 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/location_time"
+        android:id="@+id/time_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="280dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="108dp"
         android:alpha="0"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/time_event"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/location_back"
-        android:layout_width="43dp"
-        android:layout_height="41dp"
+        android:id="@+id/time_back"
+        android:layout_width="36dp"
+        android:layout_height="38dp"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="48dp"
         android:alpha="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

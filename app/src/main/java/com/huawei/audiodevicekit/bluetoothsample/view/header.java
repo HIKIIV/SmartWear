@@ -45,4 +45,9 @@ public class header extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);//将Activity退到后台，注意不是finish()退出。
+    }
 }

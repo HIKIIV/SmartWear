@@ -21,7 +21,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".bluetoothsample.view.event"
+            android:parentActivityName=".bluetoothsample.view.header"
+            android:exported="false" />
+        <activity
+            android:name=".bluetoothsample.view.time"
+            android:parentActivityName=".bluetoothsample.view.header"
+            android:exported="false" />
+        <activity
             android:name=".bluetoothsample.view.location"
+            android:parentActivityName=".bluetoothsample.view.header"
             android:exported="false" />
         <activity
             android:name=".bluetoothsample.view.header"
