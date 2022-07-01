@@ -645,6 +645,24 @@ public class SampleBtActivity
         }
     }
 
+    private static int gravityUp = 4655 * 4655;
+    private int allAccPowLen = 0;
+    private int nearestDown = -1;
+    private int accPlayNum = 1;
+    private int maxAccPowOneSense(SensorData sensorData) {
+        int x, y, totalAccPow, maxAccPow = 0;
+        for (int i = 0; i < sensorData.accelDataLen; i++) {
+            x = sensorData.accelData[i].x;
+            y = sensorData.accelData[i].y;
+            totalAccPow = x * x + y * y;
+            if (maxAccPow < totalAccPow) {
+                maxAccPow = totalAccPow;
+            }
+        }
+        return maxAccPow;
+    }
+
+
     @Override
     public void onSensorDataChanged(SensorData sensorData) {
         runOnUiThread(() -> {
@@ -652,7 +670,47 @@ public class SampleBtActivity
             map.put("data", sensorData.toString());
             maps.add(0, map);
             tvDataCount.setText(getString(R.string.sensor_data, maps.size()));
-            simpleAdapter.notifyDataSetChanged();
+
+            if (sensorData.serviceId == 43) {
+                int maxAccPow = maxAccPowOneSense(sensorData);
+
+                if (maxAccPow > 0) {
+                    tips.setText(String.valueOf(maxAccPow));
+
+                    if (allAccPowLen < 3) {
+                        if (maxAccPow < gravityUp) {
+                            nearestDown = allAccPowLen;
+                        }
+                        allAccPowLen++;
+                    } else {
+                        if (maxAccPow < gravityUp) {
+                            nearestDown = 3;
+                        } else {
+                            if (nearestDown >= 0) {
+                                nearestDown--;
+                            }
+                        }
+
+                        if (nearestDown == -1) {
+                            if (mediaPlayer == null || !mediaPlayer.isPlaying()) {
+                                String filename = String.valueOf(accPlayNum) + ".mp3";
+                                accPlayNum = (accPlayNum == 5) ? 1 : (accPlayNum + 1);
+
+                                if (isMediaPlayerRelease) {
+                                    initMediaPlayer(filename);
+                                    isMediaPlayerRelease = false;
+                                }
+                                mediaPlayer.start();
+                                btnplay.setEnabled(false);
+                                btnpause.setEnabled(true);
+                                btnstop.setEnabled(true);
+                            }
+                        }
+                    }
+                }
+            }
+
+//            simpleAdapter.notifyDataSetChanged();
         });
     }
 
