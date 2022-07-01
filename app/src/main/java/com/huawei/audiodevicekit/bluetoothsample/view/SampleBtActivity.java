@@ -13,6 +13,8 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -46,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -104,6 +107,8 @@ public class SampleBtActivity
     private Button btnstop;
     private boolean isMediaPlayerRelease = true;
 
+    private TextToSpeech textToSpeech;        //  TTS object
+
     public static double loc_longitude = 0;   // 持久化在内存中记录的经纬度
     public static double loc_latitude = 0;    // 持久化在内存中记录的经纬度
 
@@ -114,6 +119,8 @@ public class SampleBtActivity
     private int last_begin = 0;             // 上次播放音频的开始检测时间（60 * hour + minute）
     private int last_end = 0;               // 上次播放音频的结束检测时间（60 * hour + minute）
     private int last_time_num = -1;         // 上次按照时间播放的音频序号
+
+    private String playFileName = "";
 
     private StatusListener statusListener = new StatusListener() {
         @Override
@@ -200,6 +207,15 @@ public class SampleBtActivity
         btnplay = findViewById(R.id.Play);
         btnpause = findViewById(R.id.Pause);
         btnstop = findViewById(R.id.Stop);
+
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    ttsInitialized();
+                }
+            }
+        });
 
         Button start = findViewById(R.id.start); // starting the main program (entering header)
         start.setOnClickListener(new View.OnClickListener() {
@@ -291,6 +307,51 @@ public class SampleBtActivity
                 btnstop.setEnabled(false);
             }
         });
+    }
+
+    //  initialize TTS speaker
+    private void ttsInitialized() {
+        textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+            @Override
+            public void onStart(String s) {}
+
+            @Override
+            public void onDone(String s) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        initMediaPlayer(playFileName);
+                        isMediaPlayerRelease = false;
+
+                        mediaPlayer.start();
+                        btnplay.setEnabled(false);
+                        btnpause.setEnabled(true);
+                        btnstop.setEnabled(true);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String s) {}
+        });
+
+        int result = textToSpeech.setLanguage(Locale.CHINA);
+        if (result == TextToSpeech.LANG_MISSING_DATA
+                || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+            Toast.makeText(this, "数据缺失或不支持", Toast.LENGTH_SHORT).show();
+        } else {
+            android.util.Log.e("TTS", "Initilization Failed!");
+        }
+    }
+
+    public void startTTS(String speechText) {
+        if (textToSpeech != null && !textToSpeech.isSpeaking()) {
+            textToSpeech.setPitch(0.0f);
+            final HashMap ttsOptions = new HashMap<>();
+            ttsOptions.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "utterance");
+            textToSpeech.speak(speechText,
+                    TextToSpeech.QUEUE_FLUSH, ttsOptions);
+        }
     }
 
     private void initMediaPlayer(String dataName) {    // 加一个作为参数的文件名
@@ -466,16 +527,12 @@ public class SampleBtActivity
                     if (mediaPlayer == null || (!mediaPlayer.isPlaying() && !mediaPlayer.isLooping())) {
                         play_flag = true;
 
-                        initMediaPlayer(filename);
-                        isMediaPlayerRelease = false;
+                        playFileName = filename;
+                        startTTS("下面是一段同时间留言");
 
-                        mediaPlayer.start();
                         last_begin = begin_time;
                         last_end = end_time;
                         last_time_num = iFileLength;      // 记录上一次播放时的文件序号
-                        btnplay.setEnabled(false);
-                        btnpause.setEnabled(true);
-                        btnstop.setEnabled(true);
                     }
                     break;
                 }
@@ -524,16 +581,12 @@ public class SampleBtActivity
                     if (mediaPlayer == null || (!mediaPlayer.isPlaying() && !mediaPlayer.isLooping())) {
                         play_flag = true;
 
-                        initMediaPlayer(filename);
-                        isMediaPlayerRelease = false;
+                        playFileName = filename;
+                        startTTS("下面是一段同地点留言");
 
-                        mediaPlayer.start();
                         last_loc_latitude = out_latitude;   // 记录上一次播放时的经纬度
                         last_loc_longitude = out_longitude; // 记录上一次播放时的经纬度
                         last_serial_num = iFileLength;      // 记录上一次播放时的文件序号
-                        btnplay.setEnabled(false);
-                        btnpause.setEnabled(true);
-                        btnstop.setEnabled(true);
                     }
                     break;
                 }
@@ -720,14 +773,10 @@ public class SampleBtActivity
                                         if (last_event_num < iFileLength) {     // 循环播放
                                             play_flag = true;                   // 只播放上一次播放序号之后的文件
 
-                                            initMediaPlayer(filename);
-                                            isMediaPlayerRelease = false;
+                                            playFileName = filename;
+                                            startTTS("下面是一段同事件留言");
 
-                                            mediaPlayer.start();
                                             last_event_num = iFileLength;       // 更新上一次的播放序号
-                                            btnplay.setEnabled(false);
-                                            btnpause.setEnabled(true);
-                                            btnstop.setEnabled(true);
                                             break;
                                         }
 
@@ -764,11 +813,22 @@ public class SampleBtActivity
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        textToSpeech.stop();
+        textToSpeech.shutdown();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaPlayer.release();
+        }
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
         }
         getPresenter().deInit();
     }
