@@ -27,6 +27,7 @@ public class header extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
         Button btnNotif = findViewById(R.id.notifications);
         btnNotif.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -34,13 +35,23 @@ public class header extends AppCompatActivity {
 
             }
         });
+
         Button btnStart = findViewById(R.id.header_start);
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Click start", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent();
                 intent.setClass(header.this, location.class);//this前面为当前activty名称，class前面为要跳转到得activity名称
+                startActivity(intent);
+            }
+        });
+
+        Button header_tour = findViewById(R.id.header_tour);
+        header_tour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(header.this, tour.class);//this前面为当前activty名称，class前面为要跳转到得activity名称
                 startActivity(intent);
             }
         });

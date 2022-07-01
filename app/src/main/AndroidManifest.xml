@@ -21,17 +21,23 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".bluetoothsample.view.event"
-            android:parentActivityName=".bluetoothsample.view.header"
+            android:name=".bluetoothsample.view.tour2"
             android:exported="false" />
+        <activity
+            android:name=".bluetoothsample.view.tour"
+            android:exported="false" />
+        <activity
+            android:name=".bluetoothsample.view.event"
+            android:exported="false"
+            android:parentActivityName=".bluetoothsample.view.header" />
         <activity
             android:name=".bluetoothsample.view.time"
-            android:parentActivityName=".bluetoothsample.view.header"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".bluetoothsample.view.header" />
         <activity
             android:name=".bluetoothsample.view.location"
-            android:parentActivityName=".bluetoothsample.view.header"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".bluetoothsample.view.header" />
         <activity
             android:name=".bluetoothsample.view.header"
             android:exported="false"
