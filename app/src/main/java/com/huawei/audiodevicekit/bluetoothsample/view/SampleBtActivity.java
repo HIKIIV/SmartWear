@@ -93,6 +93,8 @@ public class SampleBtActivity
 
     private TextView tips;
 
+    public static Context context; // global context
+
     //  media player, for play the record
     private MediaPlayer mediaPlayer = new MediaPlayer();    // 怀疑是否需要改成NULL
 
@@ -102,8 +104,8 @@ public class SampleBtActivity
     private Button btnstop;
     private boolean isMediaPlayerRelease = true;
 
-    private double loc_longitude = 0;   // 持久化在内存中记录的经纬度
-    private double loc_latitude = 0;    // 持久化在内存中记录的经纬度
+    public static double loc_longitude = 0;   // 持久化在内存中记录的经纬度
+    public static double loc_latitude = 0;    // 持久化在内存中记录的经纬度
 
     private double last_loc_longitude = 0;  // 上次播放音频时的经纬度
     private double last_loc_latitude = 0;   // 上次播放音频时的经纬度
@@ -177,6 +179,8 @@ public class SampleBtActivity
 
     @Override
     protected void initView() {
+        context =  getApplicationContext();
+
         tvDevice = findViewById(R.id.tv_device);
         tvStatus = findViewById(R.id.tv_status);
         tvDataCount = findViewById(R.id.tv_data_count);
@@ -222,7 +226,7 @@ public class SampleBtActivity
             public void onClick(View view){
                 IdealRecorder idealRecorder = IdealRecorder.getInstance();
 
-                idealRecorder.setRecordFilePath(getSaveFilePath());
+                idealRecorder.setRecordFilePath(getSaveFilePath("Ideal"));
                 //如果需要保存录音文件  设置好保存路径就会自动保存  也可以通过onRecordData 回调自己保存  不设置 不会保存录音
                 IdealRecorder.RecordConfig recordConfig = new IdealRecorder.RecordConfig(MediaRecorder.AudioSource.MIC, 48000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
                 idealRecorder.setRecordConfig(recordConfig).setMaxRecordTime(300000).setVolumeInterval(200);
@@ -374,9 +378,8 @@ public class SampleBtActivity
         return new DecimalFormat("0.0000").format(num);
     }
 
-    public String getSaveFilePath(){
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
-        File file = new File(this.getExternalFilesDir("").getAbsolutePath(), "");
+    public static String getSaveFilePath(String type){
+        File file = new File(context.getExternalFilesDir("").getAbsolutePath(), "");
         if (!file.exists()) {
             file.mkdirs();
         }
@@ -395,7 +398,7 @@ public class SampleBtActivity
         // 文件前加入经度
         // 文件后加入纬度
         // 纬度之后加入时间
-        String filePath = doubleToString(loc_latitude) + "ideal" + doubleToString(loc_longitude)
+        String filePath = doubleToString(loc_latitude) + type + doubleToString(loc_longitude)
                 + "##" + year + "#" + month + "#" + day + "#" + hour + "#" + min + "#" + second + ".wav";
 
         File wavFile = new File(file, filePath);
@@ -405,9 +408,9 @@ public class SampleBtActivity
 
         try {
             wavFile.createNewFile();
-            Toast.makeText(getApplicationContext(), wavFile.toString()+"Create successful", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, wavFile.toString()+"Create successful", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
-            Toast.makeText(getApplicationContext(), wavFile.toString() + "创建文件失败", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, wavFile.toString() + "创建文件失败", Toast.LENGTH_SHORT).show();
         }
         return wavFile.getAbsolutePath();
     }

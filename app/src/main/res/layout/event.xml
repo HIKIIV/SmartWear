@@ -36,4 +36,25 @@
         android:alpha="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/event_record"
+        android:layout_width="45dp"
+        android:layout_height="41dp"
+        android:layout_marginTop="247dp"
+        android:layout_marginEnd="10dp"
+        android:alpha="0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/event_record_sig"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="266dp"
+        android:background="#FF0000"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/event_record" />
 </androidx.constraintlayout.widget.ConstraintLayout>
