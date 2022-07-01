@@ -105,6 +105,10 @@ public class SampleBtActivity
     private double loc_longitude = 0;   // 持久化在内存中记录的经纬度
     private double loc_latitude = 0;    // 持久化在内存中记录的经纬度
 
+    private double last_loc_longitude = 0;  // 上次播放音频时的经纬度
+    private double last_loc_latitude = 0;   // 上次播放音频时的经纬度
+    private int last_serial_num = -1;        // 上次播放音频时播放音频的序号
+
     private StatusListener statusListener = new StatusListener() {
         @Override
         public void onStartRecording() {
@@ -404,34 +408,50 @@ public class SampleBtActivity
         return wavFile.getAbsolutePath();
     }
 
+//    /**
+//     *  play the audio according the location
+//     */
+//    private void time_play() {
+//
+//    }
+
     /**
      *  play the audio according the location
      */
     private void loc_play() {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
+        // 询问权限
         File file = new File(this.getExternalFilesDir("").getAbsolutePath(), "");
         if (!file.exists()) {
             file.mkdirs();
         }
         File[] subFile = file.listFiles();
+        boolean play_flag = false;
         for (int iFileLength = 0; iFileLength < subFile.length; iFileLength++) {
             // 判断是否为文件夹
             if (!subFile[iFileLength].isDirectory()) {
                 String filename = subFile[iFileLength].getName();
-                int index_0 = filename.indexOf("ideal");
+                int index_0 = filename.indexOf("ideal"); // 后续拆分成time、location、event三大模式之后，需要把文件名的识别加上去
                 if(index_0 == -1){
-                    break;
+                    continue;
                 }
                 int index_1 = filename.indexOf("##");
                 double out_latitude = Double.parseDouble(filename.substring(0, index_0));
                 double out_longitude = Double.parseDouble(filename.substring(index_0 + 5, index_1));
-                if(Math.abs(loc_latitude - out_latitude) + Math.abs(loc_longitude - out_longitude) < 0.0015){
+                if(Math.abs(loc_latitude - out_latitude) + Math.abs(loc_longitude - out_longitude) < 0.0004){
+                    if(Math.abs(last_loc_latitude - out_latitude) + Math.abs(last_loc_longitude - out_longitude) < 0.0004 && iFileLength <= last_serial_num) {
+                        continue;   // 不重复播放同一个地点的同样的音频，如果游客长时间呆在同一个地点的话
+                    }
                     if (mediaPlayer == null || (!mediaPlayer.isPlaying() && !mediaPlayer.isLooping())) {
-                        if (isMediaPlayerRelease) {
-                            initMediaPlayer(filename);
-                            isMediaPlayerRelease = false;
-                        }
+                        play_flag = true;
+
+                        initMediaPlayer(filename);
+                        isMediaPlayerRelease = false;
+
                         mediaPlayer.start();
+                        last_loc_latitude = out_latitude;   // 记录上一次播放时的经纬度
+                        last_loc_longitude = out_longitude; // 记录上一次播放时的经纬度
+                        last_serial_num = iFileLength;      // 记录上一次播放时的文件序号
                         btnplay.setEnabled(false);
                         btnpause.setEnabled(true);
                         btnstop.setEnabled(true);
@@ -442,6 +462,11 @@ public class SampleBtActivity
             else{
                 continue;
             }
+        }
+        if(!play_flag && Math.abs(last_loc_latitude - loc_latitude) + Math.abs(last_loc_longitude - loc_longitude) >= 0.0006) {
+            last_loc_longitude = 0;
+            last_loc_latitude = 0;
+            last_serial_num = -1;
         }
 
     }
