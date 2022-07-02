@@ -27,6 +27,11 @@ After several tests, our app now supports message triggering during time interva
   - Recording files storage management
   - Implement the location listener
 - Jianjun Zhou：
+  - 3200104293
+  - MediaPlayer function
+  - TextToSpeech function(and listener with MediaPlayer)
+  - Audio playing according to activity
+  - file read and write management
 - Ganhao Chen：
   - 3200102534
   - MediaPlayer management
