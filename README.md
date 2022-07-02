@@ -19,8 +19,12 @@ In this way, we have implemented our unique asynchronous communication pattern: 
 
 After several tests, our app now supports message triggering during time interval of 5 mins, space interval of 30m radius and during a walk.
 
-## 3 Demo Video
-[Link](https://www.bilibili.com/video/BV19t4y187GD/?vd_source=b1592a2cdc5bf2252eec2c8e8abce3d4).
+## 3 Resource
+- [Video link](https://www.bilibili.com/video/BV19t4y187GD/?vd_source=b1592a2cdc5bf2252eec2c8e8abce3d4).
+
+- [PPT Link in Baidu Cloud](https://pan.baidu.com/s/1M3S7V0K2F8VgKcBYpPcvHQ). 
+
+  password: v22h
 
 ## 3 Section & Contribution
 - Liu Xiaokang:
@@ -41,3 +45,5 @@ After several tests, our app now supports message triggering during time interva
   - Audio playing according to location
   - Audio playing according to time
   - Filename management & parsing
+  
+
