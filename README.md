@@ -20,7 +20,12 @@ In this way, we have implemented our unique asynchronous communication pattern: 
 After several tests, our app now supports message triggering during time interval of 5 mins, space interval of 30m radius and during a walk.
 
 ## 3 Section & Contribution
-- Xiaokang Liu：
+- Liu Xiaokang:
+  - 3200105838
+  - Implement the front end of UI
+  - Voice record function
+  - Recording files storage management
+  - Implement the location listener
 - Jianjun Zhou：
 - Ganhao Chen：
   - 3200102534
