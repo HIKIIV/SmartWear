@@ -24,7 +24,7 @@ In this way, we have implemented our unique asynchronous communication pattern: 
 
 After several tests, our app now supports message triggering during time interval of 5 mins, space interval of 30m radius and during a walk.
 
-![](.\image\structure.png)
+![](./image/structure.png)
 
 <center>Figure 2 The Software Architecture</center>
 
