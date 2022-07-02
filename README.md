@@ -1,4 +1,12 @@
 # VoiceTag
+
+## Introduction
+
+> This is the result product for the Summer Bootcamp of Future Interaction for Smart Glasses hosted in Zhejiang University.
+
+VoiceTag is an Android application based on Huawei Smart Eyewear. It allows users to leave messages asynchronously by the time, location, or even activity.
+
+## Abstraction
 People may want to leave a message to somebody, expecting them to hear it at specific location, time or during specific activities. 
 
 However, the existing communication platforms, such as QQ and telegram, are too complicated to send such messages, and also can’t afford automatic message receiving.
