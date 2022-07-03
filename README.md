@@ -37,7 +37,7 @@ After several tests, our app now supports message triggering during time interva
 
   password: v22h
 
-## 3 Section & Contribution
+## 4 Section & Contribution
 
 - Liu Xiaokang:
   - 3200105838
